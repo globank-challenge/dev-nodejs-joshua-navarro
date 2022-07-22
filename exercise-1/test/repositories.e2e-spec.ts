@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
-describe('AppController (e2e)', () => {
+describe('Repositories Module', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -15,10 +15,14 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
+  it('/repositories (GET)', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/repositories')
       .expect(200)
-      .expect('Hello World!');
+      .then();
+
+    expect(typeof response.body).toBe('object');
+    expect(response.body).toHaveProperty('repositories');
+    expect(Array.isArray(response.body.repositories)).toBe(true);
   });
 });
