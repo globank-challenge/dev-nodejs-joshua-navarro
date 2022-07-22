@@ -19,9 +19,10 @@ describe('RepositoriesService', () => {
   describe('find function', () => {
     it('returns a list of repositories', async () => {
       const response = await service.find();
-      expect(typeof response).toBe(true);
-      expect(response).toHaveProperty('repositories');
-      expect(Array.isArray(response.repositories)).toBe(true);
+      expect(Array.isArray(response)).toBe(true);
+      expect(response[0]).not.toBeUndefined();
+      expect(response[0]).toHaveProperty('id');
+      expect(response[0]).toHaveProperty('state');
     });
   });
 });
