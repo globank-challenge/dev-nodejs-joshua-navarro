@@ -10,6 +10,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    ports:
+      - '26257:26257'
   test-e2e:
     build:
       context: ../exercise-2/

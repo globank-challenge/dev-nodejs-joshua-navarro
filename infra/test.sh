@@ -8,4 +8,3 @@ fi
 
 docker-compose -f ./docker-compose.$1.test.yaml up --build $option && docker-compose -f ./docker-compose.$1.test.yaml down
 
-
