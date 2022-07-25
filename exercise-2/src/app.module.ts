@@ -21,7 +21,7 @@ import { APP_PIPE } from '@nestjs/core';
         return {
           type: 'cockroachdb',
           url: database.url,
-          ssl: true,
+          ssl: false,
           entities: [Organization],
           extra: {
             options: `--cluster=${database.cluster}`,
