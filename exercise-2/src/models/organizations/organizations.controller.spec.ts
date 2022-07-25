@@ -20,6 +20,13 @@ describe('OrganizationsController', () => {
         organizations.push(organization);
         return organization;
       },
+      update: async (organizationId, updateOrganizationDto) => {
+        const organization = organizations.find((organization) => organization.id_organization === organizationId);
+
+        Object.assign(organization, updateOrganizationDto);
+
+        return organization;
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -51,6 +58,31 @@ describe('OrganizationsController', () => {
       expect(response).toHaveProperty('id');
 
       expect(organizations.length).toBe(1);
+    });
+  });
+
+  describe('update funciton', () => {
+    let updateOrganizationData: any;
+    const organizationId = 1;
+
+    beforeEach(async () => {
+      organizations.push({ id_organization: 1, name: 'New', status: 1 });
+    });
+
+    it('update an organization and return an object', async () => {
+      updateOrganizationData = { name: 'Update', status: 0 };
+
+      const response = await controller.update(organizationId, updateOrganizationData);
+
+      expect(response).toBeDefined();
+      expect(typeof response).toBe('object');
+      expect(response).toHaveProperty('id', organizationId);
+      expect(response).toHaveProperty('name', updateOrganizationData.name);
+
+      expect(organizations.length).toBe(1);
+
+      const organization = organizations.find((organization) => organization.id_organization === organizationId);
+      expect(organization).toHaveProperty('name', updateOrganizationData.name);
     });
   });
 });

@@ -7,7 +7,6 @@ import { OrganizationsService } from '../src/models/organizations/organizations.
 
 describe('Organization Module', () => {
   let app: INestApplication;
-  let organizationRequest: any;
   let connection: any;
 
   beforeEach(async () => {
@@ -32,13 +31,10 @@ describe('Organization Module', () => {
 
   describe('/organizations (POST)', () => {
     const endpoint = '/organizations';
-    organizationRequest = { name: 'Test Organization', status: 1 };
+    let organizationRequest: any = { name: 'Test Organization', status: 1 };
 
     it('must create an organization and return 201', async () => {
-      const response = await request(app.getHttpServer())
-        .post(endpoint)
-        .send(organizationRequest)
-        .expect(201);
+      const response = await request(app.getHttpServer()).post(endpoint).send(organizationRequest).expect(201);
 
       const { organization } = response.body;
 
@@ -50,45 +46,38 @@ describe('Organization Module', () => {
 
     it('must return 400 when send a bad request', async () => {
       organizationRequest = {};
-
-      await request(app.getHttpServer())
-        .post(endpoint)
-        .send(organizationRequest)
-        .expect(400);
+      await request(app.getHttpServer()).post(endpoint).send(organizationRequest).expect(400);
     });
   });
 
   describe('/organizations/{organization-id} (PATCH)', () => {
-    const endpoint = '/organizations/1';
-    organizationRequest = { name: 'Test Organization', status: 0 };
+    let endpoint = '/organizations/1';
+    let organizationRequest: any = { name: 'Test Organization', status: 0 };
 
     beforeEach(async () => {
       const organizationsService = app.get(OrganizationsService);
       const newOrganization = { name: 'Test' };
-      await organizationsService.create(newOrganization);
+      const organization = await organizationsService.create(newOrganization);
+      endpoint = `/organizations/${organization.id_organization}`;
     });
 
     it('must update an organization and return 200', async () => {
-      const response = await request(app.getHttpServer())
-        .post(endpoint)
-        .send(organizationRequest)
-        .expect(201);
-
+      const response = await request(app.getHttpServer()).patch(endpoint).send(organizationRequest).expect(200);
       const { organization } = response.body;
 
       expect(organization).toBeDefined();
-      expect(organization).toHaveProperty('id', 1);
       expect(organization).toHaveProperty('name', organizationRequest.name);
       expect(organization).toHaveProperty('status', organization.status);
     });
 
-    it('must return 400 when send a bad request', async () => {
-      organizationRequest = {};
+    it('must return 404 when organization id does not exist', async () => {
+      endpoint = '/organization/123123';
+      await request(app.getHttpServer()).patch(endpoint).send(organizationRequest).expect(404);
+    });
 
-      await request(app.getHttpServer())
-        .post(endpoint)
-        .send(organizationRequest)
-        .expect(400);
+    it('must return 400 when send a bad request', async () => {
+      organizationRequest = { name: 11 };
+      await request(app.getHttpServer()).patch(endpoint).send(organizationRequest).expect(400);
     });
   });
 });
