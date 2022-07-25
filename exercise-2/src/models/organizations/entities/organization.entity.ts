@@ -8,6 +8,6 @@ export class Organization {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ default: 1 })
   status: number;
 }
