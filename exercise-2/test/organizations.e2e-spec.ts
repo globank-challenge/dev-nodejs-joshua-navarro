@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { getConnectionToken } from '@nestjs/typeorm';
 import { OrganizationsService } from '../src/models/organizations/organizations.service';
+import { Organization } from 'src/models/organizations/entities/organization.entity';
 
 describe('Organization Module', () => {
   let app: INestApplication;
@@ -78,6 +79,33 @@ describe('Organization Module', () => {
     it('must return 400 when send a bad request', async () => {
       organizationRequest = { name: 11 };
       await request(app.getHttpServer()).patch(endpoint).send(organizationRequest).expect(400);
+    });
+  });
+
+  describe('/organizations (GET)', () => {
+    const endpoint = '/organizations';
+    let organizationDb: Organization;
+
+    beforeEach(async () => {
+      const organizationsService = app.get(OrganizationsService);
+      const newOrganization = { name: 'Test' };
+      organizationDb = await organizationsService.create(newOrganization);
+    });
+
+    it('must get a list of organizations with status 200', async () => {
+      const response = await request(app.getHttpServer()).get(endpoint).expect(200);
+
+      const { organizations } = response.body;
+
+      expect(organizations).toBeDefined();
+      expect(Array.isArray(organizations)).toBe(true);
+      expect(organizations.length).toBe(1);
+
+      const [organization] = organizations;
+
+      expect(organization).toHaveProperty('id', organizationDb.id_organization);
+      expect(organization).toHaveProperty('name', organizationDb.name);
+      expect(organization).toHaveProperty('status', organization.status);
     });
   });
 });
