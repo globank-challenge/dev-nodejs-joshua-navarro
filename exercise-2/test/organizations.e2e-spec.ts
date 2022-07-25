@@ -5,6 +5,7 @@ import { AppModule } from './../src/app.module';
 import { getConnectionToken } from '@nestjs/typeorm';
 import { OrganizationsService } from '../src/models/organizations/organizations.service';
 import { Organization } from 'src/models/organizations/entities/organization.entity';
+import { OrganizationDto } from 'src/models/organizations/dtos/organization.dto';
 
 describe('Organization Module', () => {
   let app: INestApplication;
@@ -106,6 +107,32 @@ describe('Organization Module', () => {
       expect(organization).toHaveProperty('id', organizationDb.id_organization);
       expect(organization).toHaveProperty('name', organizationDb.name);
       expect(organization).toHaveProperty('status', organization.status);
+    });
+  });
+
+  describe('/organizations/{organization-id} (DELETE)', () => {
+    let endpoint = '/organizations/1';
+    let organizationDb: Organization;
+    let organizationsService: OrganizationsService;
+
+    beforeEach(async () => {
+      organizationsService = app.get(OrganizationsService);
+      const newOrganization = { name: 'Test' };
+      organizationDb = await organizationsService.create(newOrganization);
+      endpoint = `/organizations/${organizationDb.id_organization}`;
+    });
+
+    it('must delete an organization with status 204', async () => {
+      const response = await request(app.getHttpServer()).delete(endpoint).expect(204);
+      expect(response.body).toEqual({});
+
+      const organizations = await organizationsService.list();
+      expect(organizations.length).toBe(0);
+    });
+
+    it('must return 404 when organization id does not exist', async () => {
+      endpoint = '/organization/123123';
+      await request(app.getHttpServer()).delete(endpoint).expect(404);
     });
   });
 });
