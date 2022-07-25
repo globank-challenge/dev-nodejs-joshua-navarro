@@ -33,4 +33,16 @@ export class OrganizationsService {
   async list() {
     return this.organizationsRepository.find();
   }
+
+  async delete(id: number) {
+    const organization = await this.organizationsRepository.findOne({
+      where: { id_organization: id },
+    });
+
+    if (!organization) {
+      throw new NotFoundException('organization not found');
+    }
+
+    await this.organizationsRepository.delete(id);
+  }
 }

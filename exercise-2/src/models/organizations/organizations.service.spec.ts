@@ -42,6 +42,9 @@ describe('OrganizationsService', () => {
       find: async () => {
         return organizations;
       },
+      delete: async (organizationId: number) => {
+        organizations = organizations.filter((organization) => organization.id_organization !== organizationId);
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -117,6 +120,27 @@ describe('OrganizationsService', () => {
       const [organization] = response;
 
       expect(organization).toHaveProperty('id_organization');
+    });
+  });
+
+  describe('delete funciton', () => {
+    let organizationId = 1;
+
+    beforeEach(() => {
+      organizations.push({ id_organization: 1, name: 'test', status: 1 });
+    });
+
+    it('delete a specific organization', async () => {
+      const response = await service.delete(organizationId);
+
+      expect(response).not.toBeDefined();
+      expect(organizations.length).toBe(0);
+    });
+
+    it('throws an error if organization id does not exist', async () => {
+      organizationId = 1111;
+
+      await expect(service.delete(organizationId)).rejects.toThrow(NotFoundException);
     });
   });
 });
