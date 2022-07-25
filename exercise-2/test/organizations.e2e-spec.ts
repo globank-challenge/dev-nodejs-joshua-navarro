@@ -2,11 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { getConnectionToken } from '@nestjs/typeorm';
 
 describe('Organization Module', () => {
   let app: INestApplication;
-  // TODO: use the organization dto
   let organizationRequest: any;
+  let connection: any;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -14,7 +15,12 @@ describe('Organization Module', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    connection = await app.get(getConnectionToken());
     await app.init();
+  });
+
+  afterEach(async () => {
+    connection.close();
   });
 
   describe('/organizations (POST)', () => {
