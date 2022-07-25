@@ -1,4 +1,5 @@
 export interface IConfig {
+  env: string;
   database: IDatabaseConfig;
 }
 

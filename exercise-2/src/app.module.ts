@@ -17,11 +17,12 @@ import { APP_PIPE } from '@nestjs/core';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const database = config.get<IDatabaseConfig>('database');
+        const env = config.get<string>('env');
 
         return {
           type: 'cockroachdb',
           url: database.url,
-          ssl: false,
+          ssl: env !== 'test',
           entities: [Organization],
           extra: {
             options: `--cluster=${database.cluster}`,
