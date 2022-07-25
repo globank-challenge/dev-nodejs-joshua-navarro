@@ -31,6 +31,9 @@ describe('OrganizationsController', () => {
       list: async () => {
         return organizations;
       },
+      delete: async (id) => {
+        organizations = organizations.filter((organization) => organization.id_organization !== id);
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -105,6 +108,21 @@ describe('OrganizationsController', () => {
       const [organization] = response;
 
       expect(organization).toBeInstanceOf(OrganizationDto);
+    });
+  });
+
+  describe('delete function', () => {
+    const organizationId = 1;
+
+    beforeEach(() => {
+      organizations.push({ id_organization: 1, name: 'New', status: 1 });
+    });
+
+    it('delete an organization', async () => {
+      const response = await controller.delete(organizationId);
+
+      expect(response).not.toBeDefined();
+      expect(organizations.length).toBe(0);
     });
   });
 });
