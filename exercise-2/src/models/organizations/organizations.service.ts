@@ -13,9 +13,7 @@ export class OrganizationsService {
   ) {}
 
   async create(createOrganizationDto: CreateOrganizationDto) {
-    const organization = this.organizationsRepository.create(
-      createOrganizationDto,
-    );
+    const organization = this.organizationsRepository.create(createOrganizationDto);
     return this.organizationsRepository.save(organization);
   }
 
@@ -30,5 +28,9 @@ export class OrganizationsService {
 
     Object.assign(organization, updateOrganizationDto);
     return this.organizationsRepository.save(organization);
+  }
+
+  async list() {
+    return this.organizationsRepository.find();
   }
 }

@@ -37,10 +37,10 @@ describe('OrganizationsService', () => {
         });
       },
       findOne: async (options: { where: { id_organization: number } }) => {
-        return organizations.find(
-          (organization) =>
-            organization.id_organization === options.where.id_organization,
-        );
+        return organizations.find((organization) => organization.id_organization === options.where.id_organization);
+      },
+      find: async () => {
+        return organizations;
       },
     };
 
@@ -87,10 +87,7 @@ describe('OrganizationsService', () => {
     it('update an organization', async () => {
       updateOrganizationData = { name: 'Updated Test', status: 0 };
 
-      const response = await service.update(
-        organizationId,
-        updateOrganizationData,
-      );
+      const response = await service.update(organizationId, updateOrganizationData);
 
       expect(response).toBeDefined();
       expect(response).toHaveProperty('name', updateOrganizationData.name);
@@ -101,9 +98,25 @@ describe('OrganizationsService', () => {
       updateOrganizationData = { name: 'Updated Test', status: 0 };
       organizationId = 2;
 
-      await expect(
-        service.update(organizationId, updateOrganizationData),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(organizationId, updateOrganizationData)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('list function', () => {
+    beforeEach(() => {
+      organizations.push({ id_organization: 1, name: 'test', status: 1 });
+    });
+
+    it('get a list of organizations', async () => {
+      const response = await service.list();
+
+      expect(response).toBeDefined();
+      expect(Array.isArray(response)).toBe(true);
+      expect(response.length).toBe(1);
+
+      const [organization] = response;
+
+      expect(organization).toHaveProperty('id_organization');
     });
   });
 });
