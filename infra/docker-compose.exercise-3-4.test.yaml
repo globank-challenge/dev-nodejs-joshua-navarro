@@ -1,0 +1,40 @@
+version: '3'
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:latest
+    command:
+      - 'start-single-node'
+      - '--insecure'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - '26257:26257'
+  test-e2e:
+    build:
+      context: ../exercise-3-4/
+      dockerfile: Dockerfile.test
+    command:
+      - 'test:e2e'
+    depends_on:
+      cockroachdb:
+        condition: service_healthy 
+    environment:
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/defaultdb
+      - DATABASE_CLUSTER=
+    tty: true
+  test:
+    build:
+      context: ../exercise-3-4/
+      dockerfile: Dockerfile.test
+    command:
+      - 'test'
+    depends_on:
+      cockroachdb:
+        condition: service_healthy 
+    environment:
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/defaultdb
+      - DATABASE_CLUSTER=
+    tty: true
