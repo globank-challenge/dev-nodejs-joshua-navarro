@@ -1,0 +1,16 @@
+version: '3'
+services:
+  test-e2e:
+    build:
+      context: ../exercise-1/
+      dockerfile: Dockerfile.test
+    command:
+      - 'test:e2e'
+    tty: true
+  test:
+    build:
+      context: ../exercise-1/
+      dockerfile: Dockerfile.test
+    command:
+      - 'test'
+    tty: true
