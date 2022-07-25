@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { OrganizationDto } from './dtos/organization.dto';
 import { Organization } from './entities/organization.entity';
 import { OrganizationsController } from './organizations.controller';
 import { OrganizationsService } from './organizations.service';
@@ -26,6 +27,9 @@ describe('OrganizationsController', () => {
         Object.assign(organization, updateOrganizationDto);
 
         return organization;
+      },
+      list: async () => {
+        return organizations;
       },
     };
 
@@ -83,6 +87,24 @@ describe('OrganizationsController', () => {
 
       const organization = organizations.find((organization) => organization.id_organization === organizationId);
       expect(organization).toHaveProperty('name', updateOrganizationData.name);
+    });
+  });
+
+  describe('list function', () => {
+    beforeEach(() => {
+      organizations.push({ id_organization: 1, name: 'New', status: 1 });
+    });
+
+    it('get a list of organizations', async () => {
+      const response = await controller.list();
+
+      expect(response).toBeDefined();
+      expect(Array.isArray(response)).toBeTruthy();
+      expect(response.length).toBe(1);
+
+      const [organization] = response;
+
+      expect(organization).toBeInstanceOf(OrganizationDto);
     });
   });
 });

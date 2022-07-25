@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
 import { MappingInterceptor } from '../../commons/interceptors/mapping.interceptor';
 import { CreateOrganizationDto } from './dtos/create-organization.dto';
 import { OrganizationDto } from './dtos/organization.dto';
@@ -25,5 +25,14 @@ export class OrganizationsController {
     const organization = await this.organizationService.update(organizationId, body);
 
     return new OrganizationDto(organization);
+  }
+
+  @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseInterceptors(new MappingInterceptor('organizations'))
+  async list() {
+    const organizations = await this.organizationService.list();
+
+    return organizations.map((organization) => new OrganizationDto(organization));
   }
 }
