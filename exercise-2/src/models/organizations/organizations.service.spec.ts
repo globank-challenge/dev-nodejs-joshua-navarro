@@ -19,8 +19,11 @@ describe('OrganizationsService', () => {
         organization.id_organization = organizations.length + 1;
         organization.name = partialEntity.name;
         organization.status = 1;
-        organizations.push(organization);
         return organization;
+      },
+      save: async (entity: Organization) => {
+        organizations.push(entity);
+        return entity;
       },
     };
 
