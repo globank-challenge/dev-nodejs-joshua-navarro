@@ -1,0 +1,69 @@
+version: '3'
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:latest
+    command:
+      - 'start-single-node'
+      - '--insecure'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - '26257:26257'
+  cockroachdb-init:
+    build:
+      context: ./cockroach/
+    entrypoint: init.sh
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+  exercise-1:
+    build:
+      context: ../exercise-1/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/repositories"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    environment:
+      - PORT=3001
+    ports:
+      - '3001:3001'
+    tty: true
+  exercise-2:
+    build:
+      context: ../exercise-2/
+    depends_on:
+      cockroachdb:
+        condition: service_healthy 
+      cockroachdb-init:
+        condition: service_completed_successfully
+    environment:
+      - PORT=3002
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/defaultdb
+      - DATABASE_CLUSTER=
+      - NODE_ENV=development # Only to use in local
+    ports:
+      - '3002:3002'
+    tty: true
+  exercise-3-4:
+    build:
+      context: ../exercise-3-4/
+    depends_on:
+      cockroachdb:
+        condition: service_healthy 
+      exercise-1:
+        condition: service_healthy
+      cockroachdb-init:
+        condition: service_completed_successfully
+    environment:
+      - PORT=3003
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/defaultdb
+      - DATABASE_CLUSTER=
+      - SERVER_URI_REPOSITORY=http://exercise-1:3001
+      - NODE_ENV=development # Only to use in local
+    ports:
+      - '3003:3003'
+    tty: true

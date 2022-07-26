@@ -25,12 +25,12 @@ import { Metrics } from './models/tribes/entities/metrics.entity';
         return {
           type: 'cockroachdb',
           url: database.url,
-          ssl: env !== 'test',
+          ssl: env === 'production',
           entities: [Organization, Tribe, Repository, Metrics],
           extra: {
             options: `--cluster=${database.cluster}`,
           },
-          synchronize: true,
+          synchronize: env === 'test',
         };
       },
     }),

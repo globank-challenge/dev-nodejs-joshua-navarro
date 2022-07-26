@@ -22,12 +22,12 @@ import { APP_PIPE } from '@nestjs/core';
         return {
           type: 'cockroachdb',
           url: database.url,
-          ssl: env !== 'test',
+          ssl: env === 'production',
           entities: [Organization],
           extra: {
             options: `--cluster=${database.cluster}`,
           },
-          synchronize: true,
+          synchronize: env === 'test',
         };
       },
     }),
