@@ -50,7 +50,9 @@ describe('App end-to-end Test', () => {
 
         for (let i = 1; i <= 3; i++) {
           await conn.query(
-            `INSERT INTO repository (id_repository, name, id_tribe) VALUES (${i}, 'Test Repository ${i}', ${tribe.id_tribe})`,
+            `INSERT INTO repository (id_repository, name, id_tribe, state) VALUES (${i}, 'Test Repository ${i}', ${
+              tribe.id_tribe
+            }, '${i % 2 === 0 ? 'D' : 'E'}')`,
           );
 
           const metricsEntity = metricsRep.create({
@@ -81,7 +83,7 @@ describe('App end-to-end Test', () => {
 
       expect(repositories).toBeDefined();
       expect(Array.isArray(repositories)).toBeTruthy();
-      expect(repositories.length).toBe(2);
+      expect(repositories.length).toBe(1);
 
       const [repository] = repositories;
 
@@ -105,12 +107,9 @@ describe('App end-to-end Test', () => {
     });
 
     it('throw error when return empty array, status 400', async () => {
-      const newTribe = await tribeRep.save({ name: 'New Tribe', organization });
-      endpoint = `/tribes/${newTribe.id_tribe}/repositories`;
+      const response = await request(app.getHttpServer()).get(endpoint).query({ fromCoverage: 100 }).expect(400);
 
-      const response = await request(app.getHttpServer()).get(endpoint).expect(400);
-
-      expect(response.body.message).toBe('La Tribu no tiene repositories que cumplan con la cobertura necesaria');
+      expect(response.body.message).toBe('La Tribu no tiene repositorios que cumplan con la cobertura necesaria');
     });
   });
 });
