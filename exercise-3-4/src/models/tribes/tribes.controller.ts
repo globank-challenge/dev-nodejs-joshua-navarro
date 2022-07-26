@@ -1,7 +1,9 @@
-import { ClassSerializerInterceptor, Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor, Controller, Get, Param, Query, Res, UseInterceptors } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { Parser } from 'json2csv';
 import { MappingInterceptor } from '../../commons/interceptors/mapping.interceptor';
 import { StateValidationPipe } from '../../commons/pipes/state-validation.pipe';
-import { OrganizationDetailDto } from './dtos/respository.dto';
+import { RepositoryDetailDto } from './dtos/respository.dto';
 import { TribesService } from './tribes.service';
 
 @Controller('tribes')
@@ -18,6 +20,27 @@ export class TribesController {
   ) {
     const repositories = await this.tribesService.listRepositoriesFromTribeId(tribeId, { state, fromCoverage });
 
-    return repositories.map((repository) => new OrganizationDetailDto(repository));
+    return repositories.map((repository) => new RepositoryDetailDto(repository));
+  }
+
+  @Get('/:tribeId/repositories/export')
+  async exportRepositoriesCsv(@Param('tribeId') tribeId: number, @Res({ passthrough: true }) res: any) {
+    const repositories = await this.tribesService.listRepositoriesFromTribeId(tribeId, {});
+
+    const repositoriesInstances = repositories.map((repository) => new RepositoryDetailDto(repository));
+
+    const repositoriesDtoData = plainToInstance(RepositoryDetailDto, repositoriesInstances);
+
+    const parser = new Parser();
+    const csv = parser.parse(repositoriesDtoData);
+
+    const filename = `repositories-report-tribe-${tribeId}.csv`;
+
+    res.attachment(filename);
+    res.set({
+      'Content-Type': 'application/csv',
+    });
+
+    return csv;
   }
 }

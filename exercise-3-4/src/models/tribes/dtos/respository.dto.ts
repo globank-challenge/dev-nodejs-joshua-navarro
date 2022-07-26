@@ -1,7 +1,7 @@
 import { Expose, Transform } from 'class-transformer';
 import { StateApiEnum, StateResponseEnum } from '../../../commons/enums/organization.enum';
 
-export class OrganizationDetailDto {
+export class RepositoryDetailDto {
   @Expose()
   id: string;
 
@@ -42,7 +42,7 @@ export class OrganizationDetailDto {
   @Transform(({ value }) => StateResponseEnum[value])
   state: string;
 
-  constructor(partial: Partial<OrganizationDetailDto>) {
+  constructor(partial: Partial<RepositoryDetailDto>) {
     Object.assign(this, partial);
   }
 }
